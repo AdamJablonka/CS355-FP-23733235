@@ -1,0 +1,28 @@
+title Ip-geolocation API to Open-Meteo-weather API
+
+
+participant User
+participant Server
+participant ip-geolocation API
+participant open-meteo-weather API
+
+note over User:Browser requests \nroot of site
+User->(1)Server:GET /\nHost:localhost:3000
+
+Server->(1)User: 200 OK + index.html (form to fill out)
+
+note over User:User fills out form (supplies data: **ip**) 
+
+User->(1)Server:GET /search?ip=1.2.3.4\nHost:localhost:3000
+
+note over Server: Takes the IP inputted by the user and calls a GET request for the API
+
+Server->(1)ip-geolocation API: GET /v1/?api_key=${api_key}&ip_address=${ip}\n host: https://ipgeolocation.abstractapi.com \n\n(Requests geo location data from ip-geolocation API)
+
+ip-geolocation API-> Server:200 OK + **lookup**
+
+Server->open-meteo-weather API: GET /v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`\nhost:https://api.open-meteo.com\n\nsends **{latitude}** and **{longitude}** to recieve back weather data
+
+open-meteo-weather API->Server: 200 OK + **weather data**
+
+Server->User: 200 OK (displays **temperature** & **weather code**)

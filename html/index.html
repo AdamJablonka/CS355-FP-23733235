@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>IP To Local Weather</title> 
+		<style>
+			body, form{
+				margin:20px auto;
+				max-width:400px;
+				overflow-x:hidden;
+			}
+			fieldset{
+				display: flex;
+			}
+			input#description{
+				flex-grow:50;
+				margin: 0 20px;
+			}
+			input#location{
+				flex-grow:50;
+				margin: 0 20px;
+			}
+		</style>
+	</head>
+	<body>
+		<form action="search" method="get">
+			<fieldset>
+				<legend>IP to Weather Search</legend>
+				<label for="ip">IP Address: </label>
+				<input id="ip" name="ip" type="text" />
+				
+				<input type="submit" value="Search" />
+			</fieldset>
+		</form>
+	</body>
+</html>
