@@ -1,4 +1,4 @@
-# IP2Encrypt
+# IP2Weather
 
 A Quick JavaScript Program that uses two APIs to search the location data of an IP address, and transfer it into weather data.
 
