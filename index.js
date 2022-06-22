@@ -102,6 +102,7 @@ function parse_weather_results(data, res){
 	</div>
 
 	<center>
+	<div class="weather_code_table">
 	<p>Weather Code | Description</p>
 	<p>  0	| Clear sky</p>
 	<p>  1, 2, 3	| Mainly clear, partly cloudy, and overcast</p>
@@ -116,6 +117,7 @@ function parse_weather_results(data, res){
 	<p>85, 86	| Snow showers slight and heavy</p>
 	<p>95 *	| Thunderstorm: Slight or moderate</p>
 	<p>96, 99 *	| Thunderstorm with slight and heavy hail</p>
+	</div>
 	`
     res.writeHead(200, {"Content-Type": "text/html"});
 	res.end(results);
