@@ -1,4 +1,8 @@
-// NOTE: Will NOT work due to API failure.
+/**
+* This project uses NodeJS to create a synchronous callback of information from one API to another.
+* The two API's are Abstract API (https://www.abstractapi.com/ip-geolocation-api) and the Free Weather API from Open-Meteo (open-meteo.com/en).
+* NOTE: You will need to prove your own API key for the abstract api. You can place the API key in the "credentials.json" file located in the "auth"
+*/
 const fs = require('fs');
 const http = require('http');
 const https = require('https');
@@ -16,9 +20,9 @@ function listen_handler(){
 	console.log(`Now Listening on Port ${port}`);
 }
 
+
 function request_handler(req, res){
     console.log(req.url);
-
     if(req.url === "/"){
         const form = fs.createReadStream("html/index.html");
 		res.writeHead(200, {"Content-Type": "text/html"});
@@ -33,9 +37,9 @@ function request_handler(req, res){
             res.writeHead(404, {"Content-Type": "text/html"});
             res.end("<h1>Missing Input</h1>");        
         }
-        else{
-            const ip_api = https.request(`https://ipgeolocation.abstractapi.com/v1/?api_key=${api_key}&ip_address=${ip}`);
 
+        else{
+            const ip_api = https.request(`https://ipgeolocation.abstractapi.com/v1/?api_key=${api_key}&ip_address=${ip}`);  // First API call.
             ip_api.on("response" , ip_res => process_stream(ip_res, parse_results, res));
 			ip_api.end();
         } 
@@ -56,11 +60,12 @@ function process_stream (stream, callback , ...args){
 
 function parse_results(data, res){
     const lookup = JSON.parse(data);
-	if(typeof lookup.city !== 'undefined'){
+	if(typeof lookup.city !== 'undefined'){  // Synchrounous callback statement.
 		let longitude = lookup.longitude;
 		let latitude = lookup.latitude;
 		weather_api_call(res, longitude, latitude);
     }
+
 	else{
 		let results = "<h1>No Results Found!</h1>";
 		res.writeHead(404, {"Content-Type": "text/html"});
@@ -69,8 +74,8 @@ function parse_results(data, res){
 	}
 }
 
-function weather_api_call(res, longitude, latitude, city){
-	const weather_api = https.request(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`);
+function weather_api_call(res, longitude, latitude){
+	const weather_api = https.request(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`);  // Second API call.
     weather_api.on("response" , weather_res => process_weather_stream(weather_res, parse_weather_results, res));
 	weather_api.end();
 }
