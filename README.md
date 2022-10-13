@@ -1,4 +1,4 @@
-# IP2Weather
+# IP-To-Weather
 
 This project uses NodeJS to create a synchronous callback of information from one API to another.
 The two API's are [Abstract API](https://www.abstractapi.com/ip-geolocation-api) and the [Free Weather API from Open-Meteo](open-meteo.com/en).
