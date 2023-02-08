@@ -21,7 +21,7 @@ function listen_handler(){
 }
 
 
-function request_handler(req, res){
+async function request_handler(req, res){
     console.log(req.url);
     if(req.url === "/"){
         const form = fs.createReadStream("html/index.html");
@@ -39,7 +39,7 @@ function request_handler(req, res){
         }
 
         else{
-            const ip_api = https.request(`https://ipgeolocation.abstractapi.com/v1/?api_key=${api_key}&ip_address=${ip}`);  // First API call.
+            const ip_api = await https.request(`https://ipgeolocation.abstractapi.com/v1/?api_key=${api_key}&ip_address=${ip}`);  // First API call.
             ip_api.on("response" , ip_res => process_stream(ip_res, parse_results, res));
 			ip_api.end();
         } 
