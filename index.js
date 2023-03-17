@@ -6,6 +6,8 @@
 const fs = require('fs');
 const http = require('http');
 const https = require('https');
+const NodeCache = require("node-cache")
+const cache = new nodeCache();
 
 const credentials = require("./auth/credentials.json");
 let api_key = credentials['API-Key']; 
@@ -30,21 +32,23 @@ function request_handler(req, res){
     }
 
     else if(req.url.startsWith("/search")){
-        const user_input = new URL(req.url, `https://${req.headers.host}`).searchParams;
-        console.log(user_input);
-        const ip = user_input.get('ip');
-        if(ip == null || ip == ""){
-            res.writeHead(404, {"Content-Type": "text/html"});
-            res.end("<h1>Missing Input</h1>");        
-        }
-
-        else{
+	const cachedResult = cache.get(ip);
+	if (cachedResult) { // If the result is in the cache, return it
+		console.log("Returning result from cache...");
+                res.writeHead(200, {"Content-Type": "text/html"});
+                res.end(cachedResult);
+        } else { const user_input = new URL(req.url, `https://${req.headers.host}`).searchParams;
+        	console.log(user_input);
+        	const ip = user_input.get('ip');
+        	if(ip == null || ip == ""){
+            		res.writeHead(404, {"Content-Type": "text/html"});
+            		res.end("<h1>Missing Input</h1>");        
+        } else {
             const ip_api = https.request(`https://ipgeolocation.abstractapi.com/v1/?api_key=${api_key}&ip_address=${ip}`);  // First API call.
             ip_api.on("response" , ip_res => process_stream(ip_res, parse_results, res));
 			ip_api.end();
         } 
     }
-
     else{
     res.writeHead(404, {"Content-Type": "text/html"});
     res.end("<h1>404, Not Found</h1>");    
