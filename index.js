@@ -6,8 +6,6 @@
 const fs = require('fs');
 const http = require('http');
 const https = require('https');
-const NodeCache = require("node-cache")
-const cache = new nodeCache();
 
 const credentials = require("./auth/credentials.json");
 let api_key = credentials['API-Key']; 
@@ -32,23 +30,21 @@ function request_handler(req, res){
     }
 
     else if(req.url.startsWith("/search")){
-	const cachedResult = cache.get(ip);
-	if (cachedResult) { // If the result is in the cache, return it
-		console.log("Returning result from cache...");
-                res.writeHead(200, {"Content-Type": "text/html"});
-                res.end(cachedResult);
-        } else { const user_input = new URL(req.url, `https://${req.headers.host}`).searchParams;
-        	console.log(user_input);
-        	const ip = user_input.get('ip');
-        	if(ip == null || ip == ""){
-            		res.writeHead(404, {"Content-Type": "text/html"});
-            		res.end("<h1>Missing Input</h1>");        
-        } else {
+        const user_input = new URL(req.url, `https://${req.headers.host}`).searchParams;
+        console.log(user_input);
+        const ip = user_input.get('ip');
+        if(ip == null || ip == ""){
+            res.writeHead(404, {"Content-Type": "text/html"});
+            res.end("<h1>Missing Input</h1>");        
+        }
+
+        else{
             const ip_api = https.request(`https://ipgeolocation.abstractapi.com/v1/?api_key=${api_key}&ip_address=${ip}`);  // First API call.
             ip_api.on("response" , ip_res => process_stream(ip_res, parse_results, res));
 			ip_api.end();
         } 
     }
+
     else{
     res.writeHead(404, {"Content-Type": "text/html"});
     res.end("<h1>404, Not Found</h1>");    
@@ -78,9 +74,9 @@ function parse_results(data, res){
 	}
 }
 
-async function weather_api_call(res, longitude, latitude){
+function weather_api_call(res, longitude, latitude){
 	const weather_api = https.request(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`);  // Second API call.
-    await weather_api.on("response" , weather_res => process_weather_stream(weather_res, parse_weather_results, res));
+    weather_api.on("response" , weather_res => process_weather_stream(weather_res, parse_weather_results, res));
 	weather_api.end();
 }
 
@@ -109,7 +105,6 @@ function parse_weather_results(data, res){
 	<h2>The temperature outside the location of the current IP adress is: ${temperature} degrees Fahrenheit!</h2>
 	<h2>Weather code: ${weather_code}</h2>
 	</div>
-
 	<center>
 	<div class="weather_code_table">
 	<p>Weather Code | Description</p>
